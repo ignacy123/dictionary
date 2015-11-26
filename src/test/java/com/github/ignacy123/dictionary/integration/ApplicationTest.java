@@ -1,6 +1,7 @@
 package com.github.ignacy123.dictionary.integration;
 
 import com.github.ignacy123.dictionary.take1.Application;
+import com.github.ignacy123.dictionary.take1.ApplicationClosedException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -32,6 +33,12 @@ public class ApplicationTest {
     public void receiveInputReturnsInvalidWordText() {
         Application application = new Application();
         assertThat(application.receiveInput("nonExistingWord"), is("Nie znaleziono słowa. Spróbuj ponownie\n"));
+
+    }
+    @Test(expected = ApplicationClosedException.class)
+    public void throwsExceptionOnExitCommand(){
+        Application application = new Application();
+        application.receiveInput(Application.COMMAND_EXIT);
 
     }
 }

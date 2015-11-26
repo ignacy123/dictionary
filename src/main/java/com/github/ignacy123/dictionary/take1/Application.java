@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
  * Created by ignacy on 19.11.15.
  */
 public class Application {
+    public static final String COMMAND_EXIT = "/exit";
     private Dictionary dictionary = new Dictionary();
 
     public String start() {
@@ -15,6 +16,10 @@ public class Application {
     }
 
     public String receiveInput(String input) {
+        input = input.trim().toLowerCase();
+        if (input.equals(COMMAND_EXIT)) {
+            throw new ApplicationClosedException();
+        }
         try {
             return String.format("%s = %s%n", input, dictionary.translate(input));
         } catch (InvalidWordException e) {
@@ -27,14 +32,15 @@ public class Application {
         Application application = new Application();
         System.out.println(application.start());
         String line = reader.readLine();
-        line = line.trim();
-        line = line.toLowerCase();
-        while (line != null && !line.equals("exit")) {
-            String applicationOutput = application.receiveInput(line);
-            System.out.print(applicationOutput);
+        while (true) {
+            try {
+                String applicationOutput = application.receiveInput(line);
+                System.out.print(applicationOutput);
+            } catch (ApplicationClosedException e) {
+                break;
+            }
+
             line = reader.readLine();
-            line = line.trim();
-            line = line.toLowerCase();
         }
     }
 }
