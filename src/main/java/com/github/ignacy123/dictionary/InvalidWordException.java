@@ -1,4 +1,4 @@
-package com.github.ignacy123.dictionary.take1;
+package com.github.ignacy123.dictionary;
 
 /**
  * Created by ignacy on 19.11.15.

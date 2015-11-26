@@ -1,7 +1,7 @@
 package com.github.ignacy123.dictionary.integration;
 
-import com.github.ignacy123.dictionary.take1.Application;
-import com.github.ignacy123.dictionary.take1.ApplicationClosedException;
+import com.github.ignacy123.dictionary.Application;
+import com.github.ignacy123.dictionary.ApplicationClosedException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;

@@ -1,4 +1,4 @@
-package com.github.ignacy123.dictionary.take1;
+package com.github.ignacy123.dictionary;
 
 import java.io.BufferedReader;
 import java.io.IOException;
