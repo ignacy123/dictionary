@@ -15,6 +15,10 @@ public class Dictionary {
         words.put("orange", "pomarańcza");
     }
 
+    public void add(String a, String b) {
+        words.put(a, b);
+    }
+
     public Dictionary(File translationsFile) {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(translationsFile))) {
             Map<String, String> translations = (Map<String, String>) inputStream.readObject();
@@ -29,5 +33,18 @@ public class Dictionary {
             return words.get(word);
         }
         throw new InvalidWordException();
+    }
+
+    public void addOrSet(String word, String translation) {
+        words.put(word, translation);
+    }
+
+    public void save(File file) throws FileNotFoundException {
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+            outputStream.writeObject(words);
+        } catch (IOException e) {
+            throw new FileNotFoundException();
+        }
+
     }
 }

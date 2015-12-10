@@ -1,14 +1,14 @@
 package com.github.ignacy123.dictionary;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * Created by ignacy on 19.11.15.
  */
 public class Application {
     public static final String COMMAND_EXIT = "/exit";
+    public static final String COMMAND_ADD = "/add";
+    public static final String COMMAND_HELP = "/h";
     private Dictionary dictionary = new Dictionary();
 
     public String start() {
@@ -17,14 +17,30 @@ public class Application {
 
     public String receiveInput(String input) {
         input = input.trim().toLowerCase();
-        if (input.equals(COMMAND_EXIT)) {
-            throw new ApplicationClosedException();
+        switch (input) {
+            case COMMAND_EXIT:
+                throw new ApplicationClosedException();
+
+            case COMMAND_HELP:
+                return ("Lista komend:\n /exit - wyjście\n /add słowo1 słowo2 - dodawanie słów do słownika\n");
+
+            default:
+                if (input.startsWith(COMMAND_ADD)) {
+                    String[] params = this.readCommandParams(COMMAND_ADD, input);
+                    if(params.length<2){
+                        throw new WrongParamsException();
+                    }
+                    dictionary.add(params[0], params[1]);
+                    return "Dodano słowo.";
+                }
+                try {
+                    return String.format("%s = %s%n", input, dictionary.translate(input));
+                } catch (InvalidWordException e) {
+                    return "Nie znaleziono słowa. Spróbuj ponownie\n";
+                }
+
         }
-        try {
-            return String.format("%s = %s%n", input, dictionary.translate(input));
-        } catch (InvalidWordException e) {
-            return "Nie znaleziono słowa. Spróbuj ponownie\n";
-        }
+
     }
 
     public static void main(String[] args) throws IOException {
@@ -42,5 +58,12 @@ public class Application {
 
             line = reader.readLine();
         }
+    }
+
+    public String[] readCommandParams(String command, String input) {
+        String paramsString = input.substring(COMMAND_ADD.length());
+        paramsString = paramsString.trim();
+        return paramsString.split("\\s+");
+
     }
 }

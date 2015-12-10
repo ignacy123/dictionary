@@ -4,10 +4,7 @@ import com.github.ignacy123.dictionary.Dictionary;
 import com.github.ignacy123.dictionary.InvalidWordException;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,9 +31,7 @@ public class DictionaryTest {
     @Test
     public void readsTranslationsFile() throws Exception {
         File translationsFile = File.createTempFile("translations", "obj");
-        Map<String, String> translations = new HashMap<>();
-        translations.put("apple", "jabłko");
-        translations.put("orange", "pomarańcza");
+        Map<String, String> translations = createTestTranlations();
         ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(translationsFile));
         outputStream.writeObject(translations);
         outputStream.close();
@@ -44,4 +39,42 @@ public class DictionaryTest {
         assertThat(dictionary.translate("apple"), is("jabłko"));
         assertThat(dictionary.translate("orange"), is("pomarańcza"));
     }
+
+    private Map<String, String> createTestTranlations() {
+        Map<String, String> translations = new HashMap<>();
+        translations.put("apple", "jabłko");
+        translations.put("orange", "pomarańcza");
+        return translations;
+    }
+
+    @Test
+    public void translatesPreviouslyAddedWord() throws Exception {
+        Dictionary dictionary = new Dictionary();
+        dictionary.addOrSet("cherry", "wiśnia");
+        assertThat(dictionary.translate("cherry"), is("wiśnia"));
+    }
+
+    @Test
+    public void translatesPreviouslyReplacedWord() throws Exception {
+        Dictionary dictionary = new Dictionary();
+        dictionary.addOrSet("orange", "pomarańczowy");
+        assertThat(dictionary.translate("orange"), is("pomarańczowy"));
+    }
+
+    @Test
+    public void savesWords() throws IOException, ClassNotFoundException {
+        Dictionary dictionary = new Dictionary();
+        File file = File.createTempFile("translations", ".obj");
+        dictionary.save(file);
+        Map<String, String> translations = new HashMap<>();
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file))) {
+            translations = (Map<String, String>) objectInputStream.readObject();
+
+        }
+        Map<String, String> expectedTranslations = createTestTranlations();
+        assertThat(translations, is(expectedTranslations));
+
+    }
+
+
 }
