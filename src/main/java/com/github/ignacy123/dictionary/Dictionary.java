@@ -15,9 +15,6 @@ public class Dictionary {
         words.put("orange", "pomarańcza");
     }
 
-    public void add(String a, String b) {
-        words.put(a, b);
-    }
 
     public Dictionary(File translationsFile) {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(translationsFile))) {
@@ -37,6 +34,7 @@ public class Dictionary {
 
     public void addOrSet(String word, String translation) {
         words.put(word, translation);
+        words.put(translation, word);
     }
 
     public void save(File file) throws FileNotFoundException {

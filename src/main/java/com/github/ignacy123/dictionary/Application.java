@@ -9,10 +9,14 @@ public class Application {
     public static final String COMMAND_EXIT = "/exit";
     public static final String COMMAND_ADD = "/add";
     public static final String COMMAND_HELP = "/h";
-    private Dictionary dictionary = new Dictionary();
+    private Dictionary dictionary;
 
     public String start() {
         return "Szukaj tłumaczenia dla: ";
+    }
+
+    public Application(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
     public String receiveInput(String input) {
@@ -27,10 +31,10 @@ public class Application {
             default:
                 if (input.startsWith(COMMAND_ADD)) {
                     String[] params = this.readCommandParams(COMMAND_ADD, input);
-                    if(params.length<2){
+                    if (params.length < 2) {
                         throw new WrongParamsException();
                     }
-                    dictionary.add(params[0], params[1]);
+                    dictionary.addOrSet(params[0], params[1]);
                     return "Dodano słowo.";
                 }
                 try {
@@ -44,8 +48,9 @@ public class Application {
     }
 
     public static void main(String[] args) throws IOException {
+        Dictionary dictionary = new Dictionary();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        Application application = new Application();
+        Application application = new Application(dictionary);
         System.out.println(application.start());
         String line = reader.readLine();
         while (true) {

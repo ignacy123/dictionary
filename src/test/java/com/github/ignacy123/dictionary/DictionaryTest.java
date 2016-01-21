@@ -76,5 +76,19 @@ public class DictionaryTest {
 
     }
 
+    @Test
+    public void translatesReverse() {
+        Dictionary dictionary = new Dictionary();
+        dictionary.addOrSet("cherry", "wiśnia");
+        assertThat(dictionary.translate("wiśnia"), is("cherry"));
+    }
+    @Test
+    public void ambiguousTranslation(){
+        Dictionary dictionary = new Dictionary();
+        dictionary.addOrSet("list", "lista");
+        dictionary.addOrSet("letter", "list");
+        assertThat(dictionary.translate("list"), is("lista"));
+
+    }
 
 }
