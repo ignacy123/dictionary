@@ -9,14 +9,29 @@ import java.util.Scanner;
  * Created by ignacy on 21.01.16.
  */
 public class DictionaryFactory {
-    public  MultiDictionary fromC5InputStream(InputStream inputStream) {
-        try (Scanner sc = new Scanner(inputStream)) {
-            return scanC5InputStream(sc);
+    private final Scanner sc;
+    private final MultiDictionary multiDictionary = new MultiDictionary();
+
+    private DictionaryFactory(InputStream inputStream) {
+        sc = new Scanner(inputStream);
+        sc.useDelimiter("");
+    }
+
+    public static MultiDictionary createDictionaryFromC5InputStream(InputStream inputStream) {
+        DictionaryFactory dictionaryFactory = new DictionaryFactory(inputStream);
+        return dictionaryFactory.scan();
+    }
+
+    private MultiDictionary scan() {
+        try {
+            scanC5InputStream();
+            return multiDictionary;
+        } finally {
+            sc.close();
         }
     }
 
-    private  MultiDictionary scanC5InputStream(Scanner sc) {
-        MultiDictionary multiDictionary = new MultiDictionary();
+    private void scanC5InputStream() {
         outer:
         while (true) {
             while (true) {
@@ -27,24 +42,46 @@ public class DictionaryFactory {
                     break;
                 }
             }
-            sc.nextLine();
-            String word = sc.nextLine();
-            sc.nextLine();
-            String translation = "";
-            List<String> translations = new ArrayList<>();
-            while (sc.hasNextLine() && !(translation = sc.nextLine()).matches("\\s*")) {
-                translation = translation.replaceAll("\\d+\\. ", "");
-                if (!translation.trim().startsWith("idiom:") && !translation.contains("=")) {
-                    translation = translation.replaceAll("<.+>", "");
-                    translation = translation.replaceAll("\\(.+\\)", "");
+            readTranslationUnit();
+        }
+    }
 
-                    translations.add(translation.trim());
-                }
-            }
-            if (!translations.isEmpty()) {
-                multiDictionary.addTranslation(word, translations);
+    private void readTranslationUnit() {
+        sc.nextLine();
+        String word = sc.nextLine();
+        sc.nextLine();
+        List<String> translations = new ArrayList<>();
+        while (scannerHasNextTranslation()) {
+            String translation = sc.nextLine();
+            translation = removeOrdinal(translation);
+            if (isTranslationValid(translation)) {
+                translations.add(makeValid(translation));
             }
         }
-        return multiDictionary;
+        if (!translations.isEmpty()) {
+            multiDictionary.addTranslation(word, translations);
+        }
     }
+
+    private boolean isTranslationValid(String translation) {
+        return !translation.trim().startsWith("idiom:") && !translation.contains("=");
+    }
+
+    private boolean scannerHasNextTranslation() {
+        return sc.hasNextLine() && !sc.hasNext("\\s*\n");
+    }
+
+    private String makeValid(String translation) {
+        translation = translation.replaceAll("<.+>", "");
+        translation = translation.replaceAll("\\(.+\\)", "");
+        translation = translation.trim();
+        return translation;
+    }
+
+    private String removeOrdinal(String translation) {
+        translation = translation.replaceAll("\\d+\\. ", "");
+        return translation;
+    }
+
+
 }

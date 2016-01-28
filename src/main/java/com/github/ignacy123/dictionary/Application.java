@@ -9,13 +9,13 @@ public class Application {
     public static final String COMMAND_EXIT = "/exit";
     public static final String COMMAND_ADD = "/add";
     public static final String COMMAND_HELP = "/h";
-    private Dictionary dictionary;
+    private MultiDictionary dictionary;
 
     public String start() {
         return "Szukaj tłumaczenia dla: ";
     }
 
-    public Application(Dictionary dictionary) {
+    public Application(MultiDictionary dictionary) {
         this.dictionary = dictionary;
     }
 
@@ -29,16 +29,9 @@ public class Application {
                 return ("Lista komend:\n /exit - wyjście\n /add słowo1 słowo2 - dodawanie słów do słownika\n");
 
             default:
-                if (input.startsWith(COMMAND_ADD)) {
-                    String[] params = this.readCommandParams(COMMAND_ADD, input);
-                    if (params.length < 2) {
-                        throw new WrongParamsException();
-                    }
-                    dictionary.addOrSet(params[0], params[1]);
-                    return "Dodano słowo.";
-                }
+
                 try {
-                    return String.format("%s = %s%n", input, dictionary.translate(input));
+                    return String.format("%s = %s%n", input, dictionary.getTranslations(input));
                 } catch (InvalidWordException e) {
                     return "Nie znaleziono słowa. Spróbuj ponownie\n";
                 }
@@ -48,9 +41,10 @@ public class Application {
     }
 
     public static void main(String[] args) throws IOException {
-        Dictionary dictionary = new Dictionary();
+        InputStream inputStream = Application.class.getResourceAsStream("/dictionary.c5");
+        MultiDictionary multiDictionary = DictionaryFactory.createDictionaryFromC5InputStream(inputStream);
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        Application application = new Application(dictionary);
+        Application application = new Application(multiDictionary);
         System.out.println(application.start());
         String line = reader.readLine();
         while (true) {
