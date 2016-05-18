@@ -70,5 +70,9 @@ public class ApplicationTest {
         assertThat(params, is(expectedParams));
         verifyNoMoreInteractions(dictionary);
     }
+    @Test
+    public void WritesOutWordsInLines(){
+
+    }
 
 }

@@ -57,6 +57,7 @@ public class Application {
 
             line = reader.readLine();
         }
+
     }
 
     public String[] readCommandParams(String command, String input) {
@@ -64,5 +65,9 @@ public class Application {
         paramsString = paramsString.trim();
         return paramsString.split("\\s+");
 
+
+    }
+    public void writeOutWordsInLines(){
+        System.out.println(dictionary);
     }
 }
